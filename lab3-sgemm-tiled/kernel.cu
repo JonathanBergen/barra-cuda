@@ -24,6 +24,23 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
      ********************************************************************/
 
     // INSERT KERNEL CODE HERE
+    __shared__ float Ashared[TILE_SIZE][TILE_SIZE];
+    __shared__ float Bshared[TILE_SIZE][TILE_SIZE];
+
+    // Calculate the X and Y of blocks and threads
+    int blockX = blockIdx.x;
+    int blockY = blockIdx.y;
+    int threadX = threadIdx.x;
+    int threadY = threadIdx.y;
+
+    // Compute the row and column of the targeted product element
+    int threadRow = blockY * TILE_SIZE + threadY;
+    int threadColumn = blockX * TILE_SIZE + threadX;
+
+    // Store the value
+    float calcVal = 0;
+
+    for 
 
 void basicSgemm(char transa, char transb, int m, int n, int k, float alpha, const float *A, int lda, const float *B, int ldb, float beta, float *C, int ldc)
 {
@@ -48,6 +65,8 @@ void basicSgemm(char transa, char transb, int m, int n, int k, float alpha, cons
     }
 
     // Initialize thread block and kernel grid dimensions ---------------------
+
+    // I think that m holds the width 
 
     const unsigned int BLOCK_SIZE = TILE_SIZE;
 
