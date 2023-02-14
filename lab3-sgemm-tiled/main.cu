@@ -71,7 +71,13 @@ int main (int argc, char *argv[])
     printf("Allocating device variables..."); fflush(stdout);
     startTime(&timer);
 
-    //INSERT CODE HERE
+    cuda_ret = cudaMalloc((void **) &A_d, sizeof(float)*A_sz);
+    if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
+    cuda_ret = cudaMalloc((void **) &B_d, sizeof(float)*B_sz);
+    if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
+    cuda_ret = cudaMalloc((void **) &C_d, sizeof(float)*C_sz);
+    if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
+
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
 
     // Copy host variables to device ------------------------------------------
@@ -79,9 +85,10 @@ int main (int argc, char *argv[])
     printf("Copying data from host to device..."); fflush(stdout);
     startTime(&timer);
 
-    //INSERT CODE HERE
-
-
+    cuda_ret = cudaMemcpy(A_d, A_h, sizeof(float)*A_sz, cudaMemcpyHostToDevice);
+    if(cuda_ret != cudaSuccess) printf("Unable to copy memory to the device");
+    cuda_ret = cudaMemcpy(B_d, B_h, sizeof(float)*B_sz, cudaMemcpyHostToDevice);
+    if(cuda_ret != cudaSuccess) printf("Unable to copy memory to the device");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
@@ -101,7 +108,8 @@ int main (int argc, char *argv[])
     printf("Copying data from device to host..."); fflush(stdout);
     startTime(&timer);
 
-    //INSERT CODE HERE
+    cuda_ret = cudaMemcpy(C_h, C_d, sizeof(float)*C_sz, cudaMemcpyDeviceToHost);
+    if(cuda_ret != cudaSuccess) printf("Unable to copy memory to the host");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
@@ -119,7 +127,9 @@ int main (int argc, char *argv[])
     free(B_h);
     free(C_h);
 
-    //INSERT CODE HERE
+    cudaFree(A_d);
+    cudaFree(B_d);
+    cudaFree(C_d);
 
     return 0;
 
