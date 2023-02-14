@@ -1,0 +1,20 @@
+1: How many times is each element of each input matrix loaded during the execution of the
+kernel?
+
+Each element in the M-height and N-width row-based matrix will be loaded a minimun of N times.
+Without memory coalescing, Each element in the N-height and P-Width column-based matrix will be 
+accessed N x P times, since the entire row will be loaded for every element in the column in interest.
+
+2: What is the memory-access to floating-point computation ratio in each thread? Consider
+multiplication and addition as separate operations, and ignore the global memory store at the
+end. Only count global memory loads towards your off-chip bandwidth
+
+The ratio is 2:3, two operations per three accesses. 
+
+if(row < m && col < n) {
+      float sum = 0;
+      for(unsigned int i = 0; i < k; ++i) {
+        sum += A[row*k + i]*B[i*n + col];       // A matrix and B matrix are being accesed, and there are two operations: += and *. Rolling ratio is 2:2
+      }                                         
+      C[row*n + col] = sum;                     // C matrix is being accessed, bring the ratio to 2:3
+    

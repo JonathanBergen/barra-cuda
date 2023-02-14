@@ -14,13 +14,13 @@
 int main (int argc, char *argv[])
 {
 
-    Timer timer;
-    cudaError_t cuda_ret;
+    // Timer timer;
+    // cudaError_t cuda_ret;
 
-    // Initialize host variables ----------------------------------------------
+    // // Initialize host variables ----------------------------------------------
 
-    printf("\nSetting up the problem..."); fflush(stdout);
-    startTime(&timer);
+    // printf("\nSetting up the problem..."); fflush(stdout);
+    // startTime(&timer);
 
     float *A_h, *B_h, *C_h;
     float *A_d, *B_d, *C_d;
@@ -62,14 +62,14 @@ int main (int argc, char *argv[])
 
     C_h = (float*) malloc( sizeof(float)*C_sz );
 
-    stopTime(&timer); printf("%f s\n", elapsedTime(timer));
-    printf("    A: %u x %u\n    B: %u x %u\n    C: %u x %u\n", matArow, matAcol,
-        matBrow, matBcol, matArow, matBcol);
+    // stopTime(&timer); printf("%f s\n", elapsedTime(timer));
+    // printf("    A: %u x %u\n    B: %u x %u\n    C: %u x %u\n", matArow, matAcol,
+    //     matBrow, matBcol, matArow, matBcol);
 
     // Allocate device variables ----------------------------------------------
 
-    printf("Allocating device variables..."); fflush(stdout);
-    startTime(&timer);
+    // printf("Allocating device variables..."); fflush(stdout);
+    // startTime(&timer);
 
     //INSERT CODE HERE
     cuda_ret = cudaMalloc((void**) &A_d, sizeof(float)*A_sz);
