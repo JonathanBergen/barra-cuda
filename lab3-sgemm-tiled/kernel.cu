@@ -12,12 +12,19 @@
 
 __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, float* C) {
 
+    // print the matrix
+    // printf("%d ", A);
+
     /********************************************************************
      *
      * Compute C = A x B
      *   where A is a (m x k) matrix
      *   where B is a (k x n) matrix
      *   where C is a (m x n) matrix
+     *      
+     *   A has m rows (height of m) and k columns (width of k)
+     *   B has k rows (height of k) and n columns (width of n)
+     *   
      *
      * Use shared memory for tiling
      *
@@ -84,19 +91,25 @@ void basicSgemm(char transa, char transb, int m, int n, int k, float alpha, cons
 
     // Initialize thread block and kernel grid dimensions ---------------------
 
-    // I think that m holds the width 
-
     const unsigned int BLOCK_SIZE = TILE_SIZE;
 
     dim3 gridDim((n - 1)/BLOCK_SIZE + 1, (m - 1)/BLOCK_SIZE + 1, 1);
     dim3 blockDim(BLOCK_SIZE, BLOCK_SIZE, 1);
 
+    // Adjust grid and block sizes to account for off-sized matrixes
+    if (n % TILE_SIZE != 0) {
+        printf("Adjusting gridDim.x\n");
+        gridDim.x += 1;
+        blockDim.x = n % TILE_SIZE;
+    }
+    if (m % TILE_SIZE != 0) {
+        printf("Adjusting gridDim.y\n");
+        gridDim.y += 1;
+        blockDim.y = m % TILE_SIZE;
+    }
+
     // Invoke CUDA kernel -----------------------------------------------------
 
     mysgemm<<< gridDim, blockDim >>> (m, n, k, A, B, C);
 
-
-
 }
-
-
