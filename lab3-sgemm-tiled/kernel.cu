@@ -41,11 +41,14 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
     int threadY = threadIdx.y;
 
     // Compute the row and column of the targeted product element
-    int threadRow = blockY * TILE_SIZE + threadY;
-    int threadColumn = blockX * TILE_SIZE + threadX;
+    int threadRow = blockY * blockDim.y + threadY;
+    int threadColumn = blockX * blockDim.x + threadX;
 
     // Store the value
     float calcVal = 0;
+
+    // print n with a label
+    printf("n: %d ", n);
 
     // I think k is the correct value to use here, because it's the shared dimension
     for (int a = 0; a < n / TILE_SIZE; ++a) {
