@@ -48,7 +48,7 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
     float calcVal = 0;
 
     // print n with a label
-    printf("n: %d ", n);
+    // printf("n: %d ", n);
 
     // I think k is the correct value to use here, because it's the shared dimension
     for (int a = 0; a < k / TILE_SIZE; ++a) {
