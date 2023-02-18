@@ -100,7 +100,7 @@ int main (int argc, char *argv[])
 		A_d, matArow, B_d, matBrow, 0.0f, C_d, matBrow);
 
     cuda_ret = cudaDeviceSynchronize();
-	if(cuda_ret != cudaSuccess) FATAL("Unable to launch kernel");
+	if(cuda_ret != cudaSuccess) printf("Unable to launch kernel");
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
 
     // Copy device variables from host ----------------------------------------
