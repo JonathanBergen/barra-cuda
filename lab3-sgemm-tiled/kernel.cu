@@ -48,11 +48,11 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
     float calcVal = 0;
 
     // I think k is the correct value to use here, because it's the shared dimension
-    for (int a = 0; a < k / TILE_SIZE; ++a) {
+    for (int a = 0; a < n / TILE_SIZE; ++a) {
         
         // Load the tiles into shared memory
-        Ashared[threadY][threadX] = A[threadRow * k + (a * TILE_SIZE + threadX)];
-        Bshared[threadY][threadX] = B[(a * TILE_SIZE + threadY) * k + threadColumn];
+        Ashared[threadY][threadX] = A[threadRow * n + (a * TILE_SIZE + threadX)];
+        Bshared[threadY][threadX] = B[(a * TILE_SIZE + threadY) * n + threadColumn];
 
         __syncthreads();
 
@@ -62,7 +62,7 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
             __syncthreads();
         }
 
-        C[threadRow * k + threadColumn] = calcVal;
+        C[threadRow * n + threadColumn] = calcVal;
 
     }
 }
