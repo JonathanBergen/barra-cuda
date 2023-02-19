@@ -14,8 +14,8 @@
 int main (int argc, char *argv[])
 {
 
-    // Timer timer;
-    // cudaError_t cuda_ret;
+    Timer timer;
+    cudaError_t cuda_ret;
 
     // // Initialize host variables ----------------------------------------------
 
@@ -73,11 +73,11 @@ int main (int argc, char *argv[])
 
     //INSERT CODE HERE
     cuda_ret = cudaMalloc((void**) &A_d, sizeof(float)*A_sz);
-	if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory");
+	if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
     cuda_ret = cudaMalloc((void**) &B_d, sizeof(float)*B_sz);
-	if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory");
+	if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
     cuda_ret = cudaMalloc((void**) &C_d, sizeof(float)*C_sz);
-	if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory");
+	if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
@@ -89,9 +89,9 @@ int main (int argc, char *argv[])
 
     //INSERT CODE HERE
     cuda_ret = cudaMemcpy(A_d, A_h, sizeof(float)*A_sz, cudaMemcpyHostToDevice);
-	if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to device");
+	if(cuda_ret != cudaSuccess) printf("Unable to copy memory to device");
     cuda_ret = cudaMemcpy(B_d, B_h, sizeof(float)*B_sz, cudaMemcpyHostToDevice);
-	if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to device");
+	if(cuda_ret != cudaSuccess) printf("Unable to copy memory to device");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
@@ -103,7 +103,7 @@ int main (int argc, char *argv[])
 		A_d, matArow, B_d, matBrow, 0.0f, C_d, matBrow);
 
     cuda_ret = cudaDeviceSynchronize();
-	if(cuda_ret != cudaSuccess) FATAL("Unable to launch kernel");
+	if(cuda_ret != cudaSuccess) printf("Unable to launch kernel");
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
 
     // Copy device variables from host ----------------------------------------
@@ -113,7 +113,7 @@ int main (int argc, char *argv[])
 
     //INSERT CODE HERE
     cuda_ret = cudaMemcpy(C_h, C_d, sizeof(float)*C_sz, cudaMemcpyDeviceToHost);
-	if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory from device");
+	if(cuda_ret != cudaSuccess) printf("Unable to copy memory from device");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));

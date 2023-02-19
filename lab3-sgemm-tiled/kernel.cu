@@ -48,41 +48,41 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
     // Store the value
     float calcVal = 0;
 
-    // print n with a label
-    // printf("n: %d ", n);
-
-    // I think k is the correct value to use here, because it's the shared dimension
+    // Loop through the tiles
     for (int a = 0; a < (TILE_SIZE + k - 1) / TILE_SIZE; ++a) {
 
-        // check if the thread is inside bounds
+        // Check if the thread is inside bounds of the A matrix
         if (a * TILE_SIZE + threadX < k && threadRow < m) {   
-            // Load the tiles into shared memory
+            // Load the tile into shared memory
             Ashared[threadY][threadX] = A[threadRow * k + (a * TILE_SIZE + threadX)];
         }
         else {
+            // Set it to zero: it is outside the final matrix's range
             Ashared[threadY][threadX] = 0.0;
         }
 
+        // Check if the thread is inside the bounds of the B matrix
         if (a * TILE_SIZE + threadY < k && threadColumn < n) {
+            // Load the tile in shared memory
             Bshared[threadY][threadX] = B[(a * TILE_SIZE + threadY) * k + threadColumn];
         }
         else {
+            // Set it to zero: it is outside the final matrix's range
             Bshared[threadY][threadX] = 0.0;
         }
 
         __syncthreads();
 
+        // Work through the tile, adding up the running sum
         for (int b = 0; b < TILE_SIZE; ++b) {
             calcVal += Ashared[threadY][b] * Bshared[b][threadX];
 
             __syncthreads();
         }
 
+        // Add all the in-bound elements to the C matrix
         if (threadRow < m && threadColumn < n) {
-            C[((blockY * blockDim.y + threadY) * n) + (blockX * blockDim.x + threadX)] = calcVal;
-
-
-            // C[threadRow * n + threadColumn] = calcVal;
+            C[threadRow * n + threadColumn] = calcVal;
         }
     }
 }
@@ -115,18 +115,6 @@ void basicSgemm(char transa, char transb, int m, int n, int k, float alpha, cons
 
     dim3 gridDim((n - 1)/BLOCK_SIZE + 1, (m - 1)/BLOCK_SIZE + 1, 1);
     dim3 blockDim(BLOCK_SIZE, BLOCK_SIZE, 1);
-
-    // Adjust grid and block sizes to account for off-sized matrixes
-    // if (n % TILE_SIZE != 0) {
-    //     printf("Adjusting gridDim.x\n");
-    //     gridDim.x += 1;
-    //     blockDim.x = n % TILE_SIZE;
-    // }
-    // if (m % TILE_SIZE != 0) {
-    //     printf("Adjusting gridDim.y\n");
-    //     gridDim.y += 1;
-    //     blockDim.y = m % TILE_SIZE;
-    // }
 
     // Invoke CUDA kernel -----------------------------------------------------
 

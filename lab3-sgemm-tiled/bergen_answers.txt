@@ -1,0 +1,12 @@
+On a 1000 x 1000 matrix, the time differences between different TILE_SIZE values were as follows:
+16 x 16: .001150 seconds
+32 x 32: .001600
+64 x 64: The test failed. My best guess is that the shared memory overflowed, and when the program went to get a element from shared memory, it wasn't there.
+Increasing the tile size slows down the program because it decreases the amount of data that must be loaded into each SM.
+Since memory-loading is the bottleneck, loading "20 data" into 6 SMs is much faster than loading "40 data" in 3 SMs.
+
+The speeds of the non-tiled lab2 implementation on a 1000 x 1000 matrix 
+was suprisingly equivalent to the tiled implementation, with an average speed of about 0.001
+
+NOTE: My tiled implementation only works for square matrixes. I spent a few days getting off-sized conditional to work for square matrixes, 
+but I couldn't get it to work for non-square ones.
