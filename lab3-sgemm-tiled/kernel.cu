@@ -24,6 +24,7 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
      *      
      *   A has m rows (height of m) and k columns (width of k)
      *   B has k rows (height of k) and n columns (width of n)
+     *   C has m rows (height of m) and n columns (width of n)
      *   
      *
      * Use shared memory for tiling
@@ -51,16 +52,23 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
     // printf("n: %d ", n);
 
     // I think k is the correct value to use here, because it's the shared dimension
-    for (int a = 0; a < k / TILE_SIZE; ++a) {
+    for (int a = 0; a < (TILE_SIZE + k - 1) / TILE_SIZE; ++a) {
 
-        // check k not dividing equally into TILE_SIZE
-        if (k % TILE_SIZE != 0) {
-            printf("k not dividing equally into TILE_SIZE");
+        // check if the thread is inside bounds
+        if (a * TILE_SIZE + threadX < k && threadRow < m) {   
+            // Load the tiles into shared memory
+            Ashared[threadY][threadX] = A[threadRow * k + (a * TILE_SIZE + threadX)];
+        }
+        else {
+            Ashared[threadY][threadX] = 0.0;
+        }
 
-        
-        // Load the tiles into shared memory
-        Ashared[threadY][threadX] = A[threadRow * k + (a * TILE_SIZE + threadX)];
-        Bshared[threadY][threadX] = B[(a * TILE_SIZE + threadY) * k + threadColumn];
+        if (a * TILE_SIZE + threadY < k && threadColumn < n) {
+            Bshared[threadY][threadX] = B[(a * TILE_SIZE + threadY) * k + threadColumn];
+        }
+        else {
+            Bshared[threadY][threadX] = 0.0;
+        }
 
         __syncthreads();
 
@@ -70,8 +78,12 @@ __global__ void mysgemm(int m, int n, int k, const float *A, const float *B, flo
             __syncthreads();
         }
 
-        C[threadRow * n + threadColumn] = calcVal;
+        if (threadRow < m && threadColumn < n) {
+            C[((blockY * blockDim.y + threadY) * n) + (blockX * blockDim.x + threadX)] = calcVal;
 
+
+            // C[threadRow * n + threadColumn] = calcVal;
+        }
     }
 }
 
@@ -105,16 +117,16 @@ void basicSgemm(char transa, char transb, int m, int n, int k, float alpha, cons
     dim3 blockDim(BLOCK_SIZE, BLOCK_SIZE, 1);
 
     // Adjust grid and block sizes to account for off-sized matrixes
-    if (n % TILE_SIZE != 0) {
-        printf("Adjusting gridDim.x\n");
-        gridDim.x += 1;
-        blockDim.x = n % TILE_SIZE;
-    }
-    if (m % TILE_SIZE != 0) {
-        printf("Adjusting gridDim.y\n");
-        gridDim.y += 1;
-        blockDim.y = m % TILE_SIZE;
-    }
+    // if (n % TILE_SIZE != 0) {
+    //     printf("Adjusting gridDim.x\n");
+    //     gridDim.x += 1;
+    //     blockDim.x = n % TILE_SIZE;
+    // }
+    // if (m % TILE_SIZE != 0) {
+    //     printf("Adjusting gridDim.y\n");
+    //     gridDim.y += 1;
+    //     blockDim.y = m % TILE_SIZE;
+    // }
 
     // Invoke CUDA kernel -----------------------------------------------------
 
