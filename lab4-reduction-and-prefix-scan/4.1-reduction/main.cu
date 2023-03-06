@@ -7,6 +7,8 @@
  ******************************************************************************/
 
 #include <stdio.h>
+#include <cmath>
+
 
 #include "support.h"
 #include "kernel.cu"
@@ -41,16 +43,12 @@ int main(int argc, char* argv[])
     }
     initVector(&in_h, in_elements);
 
-    // Print out all the elements of in_h
-    printf("\n\nin_h = [ ");
-    for(int i = 0; i < in_elements; i++) {
-        printf("%f ", in_h[i]);
-    }
-    printf("]\n");
+    // Added ceiling function to fix number of blocks error
+    out_elements = ceil(in_elements / BLOCK_SIZE);
 
-
-    out_elements = in_elements / (BLOCK_SIZE<<1);
     if(in_elements % (BLOCK_SIZE<<1)) out_elements++;
+
+    printf("out_items: %i\n", out_elements);
 
     out_h = (float*)malloc(out_elements * sizeof(float));
     if(out_h == NULL) printf("Unable to allocate host");
@@ -119,6 +117,10 @@ int main(int argc, char* argv[])
 	for(i=1; i<out_elements; i++) {
 		out_h[0] += out_h[i];
 	}
+
+    printf("First block: %f\n", out_h[0]);
+    printf("Second block: %f\n", out_h[1]);
+
 
 
 	/* Verify the result */
