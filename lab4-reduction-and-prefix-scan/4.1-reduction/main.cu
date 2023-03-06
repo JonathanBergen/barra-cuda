@@ -41,6 +41,14 @@ int main(int argc, char* argv[])
     }
     initVector(&in_h, in_elements);
 
+    // Print out all the elements of in_h
+    printf("\n\nin_h = [ ");
+    for(int i = 0; i < in_elements; i++) {
+        printf("%f ", in_h[i]);
+    }
+    printf("]\n");
+
+
     out_elements = in_elements / (BLOCK_SIZE<<1);
     if(in_elements % (BLOCK_SIZE<<1)) out_elements++;
 
@@ -106,10 +114,12 @@ int main(int argc, char* argv[])
 
     printf("Verifying results..."); fflush(stdout);
 
+
     /* Accumulate partial sums on host */
 	for(i=1; i<out_elements; i++) {
 		out_h[0] += out_h[i];
 	}
+
 
 	/* Verify the result */
     verify(in_h, in_elements, out_h[0]);

@@ -20,20 +20,29 @@ __global__ void reduction(float *out, float *in, unsigned size)
     // INSERT KERNEL CODE HERE
 
     // Shared memory
-    __shared__ int sData[];
+    __shared__ float sData[BLOCK_SIZE];
 
     // Store the thread id, in both local and global context
-    unsigned int thrId = threadId.x;
+    unsigned int thrId = threadIdx.x;
     unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
     // Load each thread's data
     sData[thrId] = in[i];
     __syncthreads();
 
+    if (threadIdx.x == 0) {
+        printf("Thread content at ind 0: %f\n", sData[thrId]);
+    }
+
+    if (in[i] != 0) {
+        printf("Thread content: %f\n", in[i]);
+    }
+
+ 
     // Stride through the elements
-    for (unsigned int stride = 2; stride < blockDim.x; stride *= 2) {
-        if (thrId % stride == 0) {
-            sData[thrId] += sData[thrId + stride / 2];
+    for (unsigned int stride = 1; stride < blockDim.x; stride *= 2) {
+        if (thrId % (stride / 2) == 0) {
+            sData[thrId] += sData[thrId + stride];
         }
         __syncthreads();
     }
