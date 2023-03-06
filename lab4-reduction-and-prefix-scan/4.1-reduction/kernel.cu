@@ -41,11 +41,12 @@ __global__ void reduction(float *out, float *in, unsigned size)
  
     // Stride through the elements
     for (unsigned int stride = 1; stride < blockDim.x; stride *= 2) {
-        if (thrId % (stride / 2) == 0) {
-            sData[thrId] += sData[thrId + stride];
+        int index = 2 * thrId * stride;
+        if (index < blockDim.x) {
+            sData[index] += sData[index + stride];
         }
         __syncthreads();
-    }
+    }   
 
     // Write the partial sum back to global memory
     if (thrId == 0) {
