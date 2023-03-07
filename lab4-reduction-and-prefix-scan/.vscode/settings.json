@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.csv": "csv",
+    "__locale": "cpp",
+    "ios": "cpp"
+  }
+}
