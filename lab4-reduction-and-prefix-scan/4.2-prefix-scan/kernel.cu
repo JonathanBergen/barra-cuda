@@ -36,9 +36,34 @@ void preScan(float *out, float *in, unsigned in_size)
         __syncthreads();
         
         if (thrId < d) {
-           int ai = offset * (thrId * 2 + 1) - 1;
-           int bi = offset * (thrId * 2 + 2) - 1;
+            int ai = offset * (thrId * 2 + 1) - 1;
+            int bi = offset * (thrId * 2 + 2) - 1;
+            temp[bi] += temp[ai];
+        }
 
+        offset *= 2;
+    }
+
+    // Set the last element to 0
+    if (thrId == 0) {
+        temp[in_size - 1] = 0;
+    }
+
+    // Sweep down the tree
+    for (int d = 1; d < in_size; d *= 2) {
+        offset >>= 1;
+        __syncthreads();
+
+        if (thrId < d) {
+            int ai = offset * (thrId * 2 + 1) - 1;
+            int bi = offset * (thrId * 2 + 2) - 1;
+            float t = temp[ai];
+            temp[ai] = temp[bi];
+            temp[bi] += t;
         }
     }
+    __syncthreads();
+
+    out[thrId * 2] = temp[thrId * 2];
+    out[thrId * 2 + 1] = temp[thrId * 2 + 1];
 }
