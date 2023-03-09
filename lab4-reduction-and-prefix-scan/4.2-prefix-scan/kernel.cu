@@ -18,8 +18,9 @@
 Setup and invoke your kernel(s) in this function. You may also allocate more
 GPU memory if you need to
 *******************************************************************************/
-void preScan(float *out, float *in, unsigned in_size)
-{
+
+__global__ void myScan(float *out, float *in, unsigned in_size) {
+
     // INSERT CODE HERE
     extern __shared__ float temp[];
     int thrId = threadIdx.x;
@@ -66,4 +67,17 @@ void preScan(float *out, float *in, unsigned in_size)
 
     out[thrId * 2] = temp[thrId * 2];
     out[thrId * 2 + 1] = temp[thrId * 2 + 1];
+}
+
+void preScan(float *out, float *in, unsigned in_size)
+{
+    // allocate the space
+    // call preScan kernel
+    // get n_blocks
+    // call the kernal on each block
+
+    dim3 dim_grid, dim_block;
+    dim_block.x = BLOCK_SIZE; dim_block.y = dim_block.z = 1;
+    dim_grid.x = in_size; dim_grid.y = dim_grid.z = 1;
+    myScan<<<dim_grid, dim_block>>>(out, in, in_size);
 }
