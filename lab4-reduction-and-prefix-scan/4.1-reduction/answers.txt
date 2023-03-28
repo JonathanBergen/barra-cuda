@@ -1,0 +1,9 @@
+How many times does a single thread block synchronize to reduce its portion of the array to
+a single value?
+
+log2(n) + 1, where n is the number of values processed by the block. (The +1 is called immediately after loading the values into each thread)
+
+What is the minimum, maximum, and average number of "real" operations that a thread will
+perform? "Real" operations are those that directly contribute to the final reduction value.
+
+Thread 0 will perform log2(n) + 1 operations, while all other threads will perform 0 (No data assigned to threa, ie. block is not fully utilized) to log2(n) operations, with an average of ~1 operation.

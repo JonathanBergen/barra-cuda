@@ -1,0 +1,2 @@
+I couldn't figure out how to handle more than one kernal launch. I spent a lot of time getting the reduction working, 
+and I figured out the logic for a single kernel launch for the prefix scan, but I don't have the time to allocate to finishing the prefix scan.

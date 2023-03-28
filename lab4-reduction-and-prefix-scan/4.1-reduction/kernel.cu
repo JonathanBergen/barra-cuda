@@ -29,15 +29,6 @@ __global__ void reduction(float *out, float *in, unsigned size)
     // Load each thread's data
     sData[thrId] = in[i];
     __syncthreads();
-
-    // if (threadIdx.x == 0) {
-    //     printf("Thread content at ind 0: %f\n", sData[thrId]);
-    // }
-
-    // if (in[i] != 0) {
-    //     printf("Thread content: %f\n", in[i]);
-    // }
-
  
     // Stride through the elements using sequential addressing
     for (unsigned int stride = blockDim.x/2; stride > 0; stride >>= 1) {
