@@ -16,7 +16,7 @@ void initVector(float **vec_h, unsigned size)
     *vec_h = (float*)malloc(size*sizeof(float));
 
     if(*vec_h == NULL) {
-        FATAL("Unable to allocate host");
+        printf("Unable to allocate host");
     }
 
     for (unsigned int i=0; i < size; i++) {

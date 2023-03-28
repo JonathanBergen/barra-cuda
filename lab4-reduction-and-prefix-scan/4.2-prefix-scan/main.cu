@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 
 	/* Allocate and initialize output vector */
 	out_h = (float*)calloc(num_elements, sizeof(float));
-	if(out_h == NULL) FATAL("Unable to allocate host");
+	if(out_h == NULL) printf("Unable to allocate host");
 
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
     printf("    Input size = %u\n", num_elements);
@@ -52,9 +52,9 @@ int main(int argc, char* argv[])
     startTime(&timer);
 
 	cuda_ret = cudaMalloc((void**)&in_d, num_elements*sizeof(float));
-	if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory");
+	if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
 	cuda_ret = cudaMalloc((void**)&out_d, num_elements*sizeof(float));
-	if(cuda_ret != cudaSuccess) FATAL("Unable to allocate device memory");
+	if(cuda_ret != cudaSuccess) printf("Unable to allocate device memory");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
@@ -66,10 +66,10 @@ int main(int argc, char* argv[])
 
     cuda_ret = cudaMemcpy(in_d, in_h, num_elements*sizeof(float),
         cudaMemcpyHostToDevice);
-	if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to the device");
+	if(cuda_ret != cudaSuccess) printf("Unable to copy memory to the device");
 
 	cuda_ret = cudaMemset(out_d, 0, num_elements*sizeof(float));
-	if(cuda_ret != cudaSuccess) FATAL("Unable to set device memory");
+	if(cuda_ret != cudaSuccess) printf("Unable to set device memory");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
     preScan(out_d, in_d, num_elements);
 
 	cuda_ret = cudaDeviceSynchronize();
-	if(cuda_ret != cudaSuccess) FATAL("Unable to launch/execute kernel");
+	if(cuda_ret != cudaSuccess) printf("Unable to launch/execute kernel");
 
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
 
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
     cuda_ret = cudaMemcpy(out_h, out_d, num_elements*sizeof(float),
         cudaMemcpyDeviceToHost);
-    if(cuda_ret != cudaSuccess) FATAL("Unable to copy memory to host");
+    if(cuda_ret != cudaSuccess) printf("Unable to copy memory to host");
 
     cudaDeviceSynchronize();
     stopTime(&timer); printf("%f s\n", elapsedTime(timer));
